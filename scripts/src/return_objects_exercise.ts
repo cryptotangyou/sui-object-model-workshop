@@ -39,6 +39,7 @@ const main = async () => {
    *
    * Create a new Transaction instance from the @mysten/sui/transactions module.
    */
+  const tx = new Transaction();
 
   /**
    * Task 2:
@@ -51,6 +52,9 @@ const main = async () => {
    * HINT: The arguments and typeArguments arguments are optional since this function does not take
    * any arguments or type arguments.
    */
+  const nft = tx.moveCall({
+    target: `${PACKAGE_ID}::sui_nft::new`,
+  });
 
   /**
    * Task 3:
@@ -61,7 +65,7 @@ const main = async () => {
    *
    * HINT: Use `suiAddress`` to transfer the object to your address.
    */
-
+  tx.transferObjects([nft], suiAddress);
 
   /**
    * Task 4:
@@ -70,15 +74,30 @@ const main = async () => {
    *
    * Print the result to the console.
    */
+  const result = await suiClient.signAndExecuteTransaction({
+    signer: keypair,
+    transaction: tx,
+    options: {
+      showEffects: true,
+      showObjectChanges: true,
+    },
+  });
 
+  console.log("Transaction digest:", result.digest);
+  console.log("Transaction effects:", JSON.stringify(result.effects, null, 2));
+  console.log("Object changes:", JSON.stringify(result.objectChanges, null, 2));
+  console.log("\nView your transaction on Sui Explorer:");
+  console.log(`https://suiscan.xyz/testnet/tx/${result.digest}`);
 
   /**
    * Task 5: Run the script with the command below and ensure it works!
-   * 
+   *
    * pnpm return-objects
-   * 
+   *
    * Verify the transaction on the Sui Explorer: https://suiscan.xyz/testnet/home
    */
+
+  //https://suiscan.xyz/testnet/tx/2DjbY6saP7zPG7QfJYAdYv1dLBSG1u11kyPoMFvwuZgb
 };
 
 main();
